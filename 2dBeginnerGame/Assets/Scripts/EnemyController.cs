@@ -12,16 +12,24 @@ public class EnemyController : MonoBehaviour
     Rigidbody2D rigidbody2D;
     float timer;
     int direction = 1;
+    bool broken = true;
 
-    // Start is called before the first frame update
+    Animator animator;
+
     void Start()
     {
         rigidbody2D = GetComponent<Rigidbody2D>();
         timer = changeTime;
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
+        if (!broken)
+        {
+            return;
+        }
+
         timer -= Time.deltaTime;
 
         if (timer < 0)
@@ -37,13 +45,23 @@ public class EnemyController : MonoBehaviour
 
         if (vertical)
         {
+            if (!broken)
+            {
+                return;
+            }
+
             if (reverse)
             {
                 position.y = position.y - Time.deltaTime * speed * direction; ;
+                animator.SetFloat("Move X", 0);
+                animator.SetFloat("Move Y", -direction);
+
             }
             else
             {
                 position.y = position.y + Time.deltaTime * speed * direction; ;
+                animator.SetFloat("Move X", 0);
+                animator.SetFloat("Move Y", direction);
             }
         }
         else
@@ -51,10 +69,14 @@ public class EnemyController : MonoBehaviour
             if (reverse)
             {
                 position.x = position.x - Time.deltaTime * speed * direction; ;
+                animator.SetFloat("Move X", -direction);
+                animator.SetFloat("Move Y", 0);
             }
             else
             {
                 position.x = position.x + Time.deltaTime * speed * direction; ;
+                animator.SetFloat("Move X", direction);
+                animator.SetFloat("Move Y", 0);
             }
         }
 
@@ -69,5 +91,11 @@ public class EnemyController : MonoBehaviour
         {
             player.ChangeHealth(-1);
         }
+    }
+    public void Fix()
+    {
+        broken = false;
+        rigidbody2D.simulated = false;
+        animator.SetTrigger("Fixed");
     }
 }
